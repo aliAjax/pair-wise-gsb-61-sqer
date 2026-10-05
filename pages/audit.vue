@@ -30,11 +30,18 @@ function exportAudit() {
       .map((project) => ({
         id: project.id,
         status: project.status,
+        revision: project.revision,
+        revisionReady: project.revisionReady,
         maintenanceVersion: project.maintenanceVersion,
         softwareVersion: project.softwareVersion,
+        currentBasis: project.versions[0]
+          ? { versionId: project.versions[0].id, label: project.versions[0].label, revision: project.versions[0].revision }
+          : undefined,
         versions: project.versions,
         evidence: project.evidence,
-        audit: project.audit
+        supplements: project.supplements,
+        audit: project.audit,
+        lastRecovery: project.lastRecovery
       }))
   };
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
@@ -75,7 +82,10 @@ function exportAudit() {
           <span class="text-xs text-slate-500">{{ entry.createdAt.slice(0, 16).replace('T', ' ') }}</span>
         </div>
         <p class="mt-1 text-sm text-slate-600">{{ entry.detail }}</p>
-        <p class="mt-1 text-xs text-slate-500">{{ entry.projectId }} · {{ entry.projectName }}</p>
+        <p class="mt-1 text-xs text-slate-500">
+          {{ entry.projectId }} · {{ entry.projectName }} ·
+          版本依据：{{ entry.basisLabel || '项目创建基线' }}
+        </p>
       </article>
       <p v-if="!entries.length" class="py-10 text-center text-sm text-slate-500">没有符合条件的审计记录。</p>
     </div>

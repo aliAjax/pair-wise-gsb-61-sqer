@@ -45,15 +45,30 @@ const openCount = computed(() => store.projects.filter((project) => !['approved'
 const supplementCount = computed(() => store.projects.filter((project) => project.status === 'supplement_required').length);
 const versionConflictCount = computed(() =>
   store.projects.filter((project) =>
-    project.evidence.some((evidence) => evidence.softwareVersion !== project.softwareVersion)
+    project.evidence.some(
+      (evidence) =>
+        evidence.softwareVersion !== project.softwareVersion &&
+        !(evidence.status === 'accepted' && evidence.basisVersionId)
+    )
   ).length
 );
+
+/** 旧数据修订号尚未回填确认的项目 */
+const revisionPendingProjects = computed(() => store.revisionPending);
 const expiringCount = computed(() =>
   store.projects.filter((project) => new Date(project.certificateExpiry) <= new Date('2026-12-31')).length
 );
 
 function riskLabel(project: (typeof projectRows.value)[number]) {
-  if (project.evidence.some((item) => item.softwareVersion !== project.softwareVersion)) return '软件版本冲突';
+  if (!project.revisionReady) return '修订号待回填';
+  if (
+    project.evidence.some(
+      (item) =>
+        item.softwareVersion !== project.softwareVersion &&
+        !(item.status === 'accepted' && item.basisVersionId)
+    )
+  )
+    return '软件版本冲突';
   if (project.regulations.some((item) => item.status !== 'complete')) return '法规覆盖缺失';
   if (new Date(project.certificateExpiry) <= new Date('2026-12-31')) return '证书临近到期';
   return '未见阻断项';
@@ -93,6 +108,18 @@ onMounted(() => {
     <div class="col-span-12 sm:col-span-6 xl:col-span-3">
       <StatTile label="90 天内到期" :value="expiringCount" note="证书或批准文件临近失效" />
     </div>
+  </section>
+
+  <section v-if="revisionPendingProjects.length" class="mb-5 border border-amber-200 bg-amber-50 p-4">
+    <p class="text-sm font-semibold text-amber-950">旧数据修订号回填</p>
+    <p class="mt-1 text-sm text-amber-900">
+      {{ revisionPendingProjects.length }} 个项目缺少历史修订号，已自动回填为 R1 但尚未确认；补全前不能批准。
+    </p>
+    <ul class="mt-2 list-inside list-disc text-sm text-amber-900">
+      <li v-for="project in revisionPendingProjects" :key="project.id">
+        <NuxtLink :to="`/projects/${project.id}`" class="underline">{{ project.id }} · {{ project.name }}</NuxtLink>
+      </li>
+    </ul>
   </section>
 
   <section class="mb-5 border border-slate-200 bg-white p-4">
@@ -149,6 +176,9 @@ onMounted(() => {
             <td>
               <p>{{ project.maintenanceVersion }}</p>
               <p class="mt-1 font-mono text-xs text-slate-500">SW {{ project.softwareVersion }}</p>
+              <p class="mt-1 text-xs" :class="project.revisionReady ? 'text-slate-400' : 'text-amber-700'">
+                R{{ project.revision }}{{ project.revisionReady ? '' : '（待回填确认）' }}
+              </p>
             </td>
             <td><StatusBadge :status="project.status" /></td>
             <td class="min-w-[150px]">

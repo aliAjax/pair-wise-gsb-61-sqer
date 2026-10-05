@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import type { EvidenceItem, EvidenceStatus } from '~/types/certification';
+import type { EvidenceItem, EvidenceStatus, ProjectVersion } from '~/types/certification';
 
 const props = defineProps<{
   evidence: EvidenceItem[];
   editable?: boolean;
+  currentSoftware?: string;
+  versions?: ProjectVersion[];
 }>();
 
 const emit = defineEmits<{
@@ -17,17 +19,22 @@ const typeLabels: Record<EvidenceItem['type'], string> = {
   exemption: '豁免材料',
   certificate: '证书'
 };
+
+function basisLabel(item: EvidenceItem) {
+  return props.versions?.find((version) => version.id === item.basisVersionId)?.label;
+}
 </script>
 
 <template>
   <div class="overflow-x-auto">
-    <table class="data-table min-w-[980px]">
+    <table class="data-table min-w-[1080px]">
       <thead>
         <tr>
           <th>证据文件</th>
           <th>法规项</th>
           <th>文件 / 软件版本</th>
           <th>配置覆盖</th>
+          <th>版本依据</th>
           <th>状态</th>
           <th>审阅说明</th>
           <th v-if="editable">操作</th>
@@ -42,11 +49,26 @@ const typeLabels: Record<EvidenceItem['type'], string> = {
           <td class="font-mono text-sm">{{ item.regulationId }}</td>
           <td>
             <p>文件 {{ item.version }}</p>
-            <p class="mt-1 text-xs" :class="item.softwareVersion !== item.softwareVersion ? 'text-red-700' : 'text-slate-500'">
+            <p
+              class="mt-1 text-xs"
+              :class="currentSoftware && item.softwareVersion !== currentSoftware && !(item.status === 'accepted' && item.basisVersionId)
+                ? 'font-medium text-red-700'
+                : 'text-slate-500'"
+            >
               软件 {{ item.softwareVersion }}
+              <span v-if="item.supersededByVersionId" class="text-amber-700">（已被新版本失效）</span>
             </p>
           </td>
           <td class="max-w-[260px] text-sm">{{ item.configurations.join('、') }}</td>
+          <td class="text-xs text-slate-500">
+            <template v-if="item.status === 'accepted' && item.basisVersionId">
+              <UBadge color="green" variant="soft">已批准锁定</UBadge>
+              <p class="mt-1">{{ basisLabel(item) ?? item.basisVersionId }}</p>
+            </template>
+            <template v-else>
+              <span class="text-slate-400">随当前基线</span>
+            </template>
+          </td>
           <td><StatusBadge :status="item.status" /></td>
           <td class="max-w-[320px] text-sm text-slate-600">{{ item.note }}</td>
           <td v-if="editable">
@@ -58,7 +80,7 @@ const typeLabels: Record<EvidenceItem['type'], string> = {
           </td>
         </tr>
         <tr v-if="!evidence.length">
-          <td :colspan="editable ? 7 : 6" class="py-12 text-center text-slate-500">当前项目尚未关联证据。</td>
+          <td :colspan="editable ? 8 : 7" class="py-12 text-center text-slate-500">当前项目尚未关联证据。</td>
         </tr>
       </tbody>
     </table>

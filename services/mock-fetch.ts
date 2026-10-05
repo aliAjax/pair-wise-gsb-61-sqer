@@ -1,15 +1,21 @@
 import { seedProjects } from '~/data/seed';
-import type { ApprovalProject } from '~/types/certification';
+import type { ApprovalProject, LegacyApprovalProject } from '~/types/certification';
+import { backfillRevision, deepClone } from './version-chain';
 
 const STORAGE_KEY = 'vehicle-type-approval-projects-v1';
 
 function currentProjects(): ApprovalProject[] {
-  if (typeof localStorage === 'undefined') return structuredClone(seedProjects);
+  if (typeof localStorage === 'undefined') {
+    return (deepClone(seedProjects) as LegacyApprovalProject[]).map((project) => backfillRevision(project));
+  }
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as ApprovalProject[]) : structuredClone(seedProjects);
+    if (raw) {
+      return (JSON.parse(raw) as LegacyApprovalProject[]).map((project) => backfillRevision(project));
+    }
+    return (deepClone(seedProjects) as LegacyApprovalProject[]).map((project) => backfillRevision(project));
   } catch {
-    return structuredClone(seedProjects);
+    return (deepClone(seedProjects) as LegacyApprovalProject[]).map((project) => backfillRevision(project));
   }
 }
 

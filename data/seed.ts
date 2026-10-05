@@ -1,4 +1,4 @@
-import type { ApprovalProject, RegulationItem } from '~/types/certification';
+import type { LegacyApprovalProject, RegulationItem } from '~/types/certification';
 
 export const regulationCatalog: RegulationItem[] = [
   {
@@ -83,7 +83,7 @@ export const regulationCatalog: RegulationItem[] = [
   }
 ];
 
-export const seedProjects: ApprovalProject[] = [
+export const seedProjects: LegacyApprovalProject[] = [
   {
     id: 'TA-2026-118',
     name: '纯电运动轿车 2027 款',

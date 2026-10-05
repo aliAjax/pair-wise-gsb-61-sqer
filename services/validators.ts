@@ -18,12 +18,21 @@ export function validateProjectInput(input: ProjectInput) {
 
 export function validateSubmission(project: ApprovalProject) {
   const issues: string[] = [];
+
+  // 旧数据修订号未回填补全前不能批准
+  if (!project.revisionReady) {
+    issues.push(`旧数据修订号尚未回填确认（当前 R${project.revision}），补全前不能批准`);
+  }
+
   const requiredRegulations = project.regulations.filter((item) => item.required);
   const missingEvidence = project.evidence.filter((item) =>
     ['missing', 'rejected', 'resubmit'].includes(item.status)
   );
+  // 已接受且锁定版本依据的证据属于历史批准内容，保留原软件口径，不计版本错配
   const versionMismatch = project.evidence.filter(
-    (item) => item.softwareVersion !== project.softwareVersion
+    (item) =>
+      item.softwareVersion !== project.softwareVersion &&
+      !(item.status === 'accepted' && item.basisVersionId)
   );
   const coverageIssue = requiredRegulations.find((item) => item.status !== 'complete');
   const expiring = new Date(project.certificateExpiry) <= new Date('2026-12-31');
@@ -42,5 +51,8 @@ export function validateEvidenceUpgrade(project: ApprovalProject, evidenceIds: s
   if (note.trim().length < 6) errors.push('批量补件说明至少 6 个字符');
   const selected = project.evidence.filter((item) => evidenceIds.includes(item.id));
   if (!selected.length) errors.push('所选证据不属于当前项目');
+  if (selected.some((item) => item.status === 'accepted' && item.basisVersionId)) {
+    errors.push('包含已按旧版本批准锁定的证据，需通过新版本基线重交而非覆盖');
+  }
   return errors;
 }
