@@ -1,4 +1,5 @@
 import type { ApprovalProject, ProjectInput } from '~/types/certification';
+import { needsRevisionBackfill } from '~/services/change-chain';
 
 export function validateProjectInput(input: ProjectInput) {
   const errors: Partial<Record<keyof ProjectInput, string>> = {};
@@ -28,6 +29,7 @@ export function validateSubmission(project: ApprovalProject) {
   const coverageIssue = requiredRegulations.find((item) => item.status !== 'complete');
   const expiring = new Date(project.certificateExpiry) <= new Date('2026-12-31');
 
+  if (needsRevisionBackfill(project)) issues.push('旧数据缺少修订号，完成回填前不能批准');
   if (missingEvidence.length) issues.push(`${missingEvidence.length} 项证据缺失、被拒或待补件`);
   if (versionMismatch.length) issues.push(`${versionMismatch.length} 项证据软件版本与项目基线不一致`);
   if (coverageIssue) issues.push(`法规项 ${coverageIssue.code} 尚未完整覆盖配置`);

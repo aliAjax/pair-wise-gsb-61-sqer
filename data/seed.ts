@@ -99,6 +99,7 @@ export const seedProjects: ApprovalProject[] = [
     agency: '华东认证中心',
     submittedAt: '2026-09-18',
     updatedAt: '2026-09-28T10:45:00.000Z',
+    revision: 2,
     certificateExpiry: '2026-12-16',
     regulations: regulationCatalog,
     evidence: [
@@ -113,6 +114,7 @@ export const seedProjects: ApprovalProject[] = [
         configurations: ['长续航四驱版', '标准续航后驱版'],
         status: 'accepted',
         note: '试验条件与量产软件基线一致。',
+        basisRevision: 2,
         updatedAt: '2026-09-20T03:00:00.000Z'
       },
       {
@@ -126,6 +128,7 @@ export const seedProjects: ApprovalProject[] = [
         configurations: ['长续航四驱版'],
         status: 'rejected',
         note: '报告软件版本落后于当前整车基线。',
+        basisRevision: 1,
         updatedAt: '2026-09-25T06:30:00.000Z'
       },
       {
@@ -139,6 +142,7 @@ export const seedProjects: ApprovalProject[] = [
         configurations: ['标准续航后驱版'],
         status: 'resubmit',
         note: '需补充长续航四驱配置后雾灯测试。',
+        basisRevision: 2,
         updatedAt: '2026-09-27T04:10:00.000Z'
       },
       {
@@ -152,12 +156,14 @@ export const seedProjects: ApprovalProject[] = [
         configurations: ['长续航四驱版', '标准续航后驱版'],
         status: 'accepted',
         note: '覆盖全部量产电池配置。',
+        basisRevision: 2,
         updatedAt: '2026-09-19T08:00:00.000Z'
       }
     ],
     versions: [
       {
         id: 'VER-118-02',
+        revision: 2,
         label: 'MY27.1 / 8.4.1',
         author: '远航汽车工程部',
         createdAt: '2026-09-27T04:10:00.000Z',
@@ -167,6 +173,7 @@ export const seedProjects: ApprovalProject[] = [
       },
       {
         id: 'VER-118-01',
+        revision: 1,
         label: 'MY27.1 / 8.3.9',
         author: '远航汽车工程部',
         createdAt: '2026-09-18T01:20:00.000Z',
@@ -175,9 +182,11 @@ export const seedProjects: ApprovalProject[] = [
         impactedConfigurations: ['长续航四驱版', '标准续航后驱版']
       }
     ],
+    supplements: [],
     audit: [
       {
         id: 'AUD-118-04',
+        revision: 2,
         actor: '刘珊',
         action: '退回补件',
         detail: '软件影响评估版本错配，照明证据缺少配置覆盖。',
@@ -185,6 +194,7 @@ export const seedProjects: ApprovalProject[] = [
       },
       {
         id: 'AUD-118-03',
+        revision: 2,
         actor: '远航汽车工程部',
         action: '更新版本',
         detail: '软件基线更新为 8.4.1，需重新确认受影响法规项。',
@@ -207,6 +217,7 @@ export const seedProjects: ApprovalProject[] = [
     agency: '华南认证中心',
     submittedAt: '2026-09-05',
     updatedAt: '2026-09-26T02:15:00.000Z',
+    revision: 1,
     certificateExpiry: '2026-11-20',
     regulations: regulationCatalog.slice(0, 6),
     evidence: [
@@ -221,6 +232,7 @@ export const seedProjects: ApprovalProject[] = [
         configurations: ['七座旗舰版'],
         status: 'accepted',
         note: '实验室报告与申报配置一致。',
+        basisRevision: 1,
         updatedAt: '2026-09-10T03:00:00.000Z'
       },
       {
@@ -234,12 +246,14 @@ export const seedProjects: ApprovalProject[] = [
         configurations: ['七座旗舰版'],
         status: 'resubmit',
         note: '测试软件版本与当前申报版本不一致。',
+        basisRevision: 1,
         updatedAt: '2026-09-26T02:15:00.000Z'
       }
     ],
     versions: [
       {
         id: 'VER-109-01',
+        revision: 1,
         label: 'MY26.2 / 5.7.0',
         author: '北辰汽车',
         createdAt: '2026-09-05T08:00:00.000Z',
@@ -248,9 +262,11 @@ export const seedProjects: ApprovalProject[] = [
         impactedConfigurations: ['七座旗舰版']
       }
     ],
+    supplements: [],
     audit: [
       {
         id: 'AUD-109-02',
+        revision: 1,
         actor: '赵驰',
         action: '要求补件',
         detail: '能耗证据软件版本需更新后重新抽样测试。',
@@ -273,6 +289,7 @@ export const seedProjects: ApprovalProject[] = [
     agency: '华北认证中心',
     submittedAt: '2026-07-12',
     updatedAt: '2026-08-30T09:20:00.000Z',
+    revision: 1,
     certificateExpiry: '2027-08-29',
     regulations: regulationCatalog.slice(0, 5),
     evidence: [
@@ -288,12 +305,14 @@ export const seedProjects: ApprovalProject[] = [
         status: 'accepted',
         expiryDate: '2027-08-29',
         note: '已纳入正式批准版本。',
+        basisRevision: 1,
         updatedAt: '2026-08-30T09:20:00.000Z'
       }
     ],
     versions: [
       {
         id: 'VER-092-02',
+        revision: 1,
         label: '批准版 / 3.2.4',
         author: '何谦',
         createdAt: '2026-08-30T09:20:00.000Z',
@@ -302,9 +321,11 @@ export const seedProjects: ApprovalProject[] = [
         impactedConfigurations: ['高顶货运版']
       }
     ],
+    supplements: [],
     audit: [
       {
         id: 'AUD-092-03',
+        revision: 1,
         actor: '何谦',
         action: '批准',
         detail: '全部适用范围证据通过审阅，提交包版本锁定。',
@@ -326,6 +347,7 @@ export const seedProjects: ApprovalProject[] = [
     reviewer: '待分派',
     agency: '华东认证中心',
     updatedAt: '2026-09-27T12:30:00.000Z',
+    revision: 1,
     certificateExpiry: '2026-10-24',
     regulations: regulationCatalog.filter((item) => ['REG-BRAKE', 'REG-EMC', 'REG-BATTERY'].includes(item.id)),
     evidence: [
@@ -340,12 +362,14 @@ export const seedProjects: ApprovalProject[] = [
         configurations: ['标准厢式版'],
         status: 'submitted',
         note: '等待认证机构确认零件号完整性。',
+        basisRevision: 1,
         updatedAt: '2026-09-27T12:30:00.000Z'
       }
     ],
     versions: [
       {
         id: 'VER-120-01',
+        revision: 1,
         label: 'MY27.0 / 1.9.2',
         author: '江洲新能源',
         createdAt: '2026-09-27T12:30:00.000Z',
@@ -354,9 +378,11 @@ export const seedProjects: ApprovalProject[] = [
         impactedConfigurations: ['标准厢式版']
       }
     ],
+    supplements: [],
     audit: [
       {
         id: 'AUD-120-01',
+        revision: 1,
         actor: '江洲新能源',
         action: '建立项目',
         detail: '创建认证证据包草稿。',

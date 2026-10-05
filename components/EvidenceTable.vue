@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { EvidenceItem, EvidenceStatus } from '~/types/certification';
 
-const props = defineProps<{
+defineProps<{
   evidence: EvidenceItem[];
   editable?: boolean;
+  /** 当前软件基线，用于标记版本错配 */
+  baselineVersion?: string;
 }>();
 
 const emit = defineEmits<{
@@ -21,7 +23,7 @@ const typeLabels: Record<EvidenceItem['type'], string> = {
 
 <template>
   <div class="overflow-x-auto">
-    <table class="data-table min-w-[980px]">
+    <table class="data-table min-w-[1080px]">
       <thead>
         <tr>
           <th>证据文件</th>
@@ -29,6 +31,7 @@ const typeLabels: Record<EvidenceItem['type'], string> = {
           <th>文件 / 软件版本</th>
           <th>配置覆盖</th>
           <th>状态</th>
+          <th>版本依据</th>
           <th>审阅说明</th>
           <th v-if="editable">操作</th>
         </tr>
@@ -42,12 +45,16 @@ const typeLabels: Record<EvidenceItem['type'], string> = {
           <td class="font-mono text-sm">{{ item.regulationId }}</td>
           <td>
             <p>文件 {{ item.version }}</p>
-            <p class="mt-1 text-xs" :class="item.softwareVersion !== item.softwareVersion ? 'text-red-700' : 'text-slate-500'">
+            <p
+              class="mt-1 text-xs"
+              :class="baselineVersion && item.softwareVersion !== baselineVersion ? 'font-medium text-red-700' : 'text-slate-500'"
+            >
               软件 {{ item.softwareVersion }}
             </p>
           </td>
           <td class="max-w-[260px] text-sm">{{ item.configurations.join('、') }}</td>
           <td><StatusBadge :status="item.status" /></td>
+          <td><RevisionBadge :revision="item.basisRevision" /></td>
           <td class="max-w-[320px] text-sm text-slate-600">{{ item.note }}</td>
           <td v-if="editable">
             <div class="flex min-w-[180px] flex-wrap gap-2">
@@ -58,7 +65,7 @@ const typeLabels: Record<EvidenceItem['type'], string> = {
           </td>
         </tr>
         <tr v-if="!evidence.length">
-          <td :colspan="editable ? 7 : 6" class="py-12 text-center text-slate-500">当前项目尚未关联证据。</td>
+          <td :colspan="editable ? 8 : 7" class="py-12 text-center text-slate-500">当前项目尚未关联证据。</td>
         </tr>
       </tbody>
     </table>

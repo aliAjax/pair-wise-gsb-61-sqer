@@ -147,7 +147,10 @@ onMounted(() => {
               <p class="mt-1 text-sm text-slate-500">{{ project.configuration }}</p>
             </td>
             <td>
-              <p>{{ project.maintenanceVersion }}</p>
+              <p class="flex items-center gap-2">
+                {{ project.maintenanceVersion }}
+                <RevisionBadge :revision="project.revision" prefix="修订" />
+              </p>
               <p class="mt-1 font-mono text-xs text-slate-500">SW {{ project.softwareVersion }}</p>
             </td>
             <td><StatusBadge :status="project.status" /></td>

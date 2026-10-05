@@ -15,7 +15,8 @@ const entries = computed(() =>
       project.audit.map((entry) => ({
         ...entry,
         projectId: project.id,
-        projectName: project.name
+        projectName: project.name,
+        currentRevision: project.revision
       }))
     )
     .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
@@ -30,10 +31,12 @@ function exportAudit() {
       .map((project) => ({
         id: project.id,
         status: project.status,
+        revision: project.revision,
         maintenanceVersion: project.maintenanceVersion,
         softwareVersion: project.softwareVersion,
         versions: project.versions,
         evidence: project.evidence,
+        supplements: project.supplements,
         audit: project.audit
       }))
   };
@@ -45,13 +48,17 @@ function exportAudit() {
   anchor.click();
   URL.revokeObjectURL(url);
 }
+
+onMounted(() => {
+  store.hydrate();
+});
 </script>
 
 <template>
   <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
     <div>
       <h1 class="text-2xl font-semibold">审计与提交包</h1>
-      <p class="mt-1 text-sm text-slate-600">保留项目变更、证据审阅、状态流转和批量补件的完整轨迹。</p>
+      <p class="mt-1 text-sm text-slate-600">保留项目变更、证据审阅、状态流转和批量补件的完整轨迹，每条记录标注写入时的版本依据。</p>
     </div>
     <div class="flex flex-wrap items-end gap-3">
       <div class="min-w-[300px]">
@@ -71,11 +78,16 @@ function exportAudit() {
     <div class="space-y-5 p-5">
       <article v-for="entry in entries" :key="entry.id" class="audit-item">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <p class="text-sm font-medium">{{ entry.action }} · {{ entry.actor }}</p>
+          <p class="flex flex-wrap items-center gap-2 text-sm font-medium">
+            {{ entry.action }} · {{ entry.actor }}
+            <RevisionBadge :revision="entry.revision" />
+          </p>
           <span class="text-xs text-slate-500">{{ entry.createdAt.slice(0, 16).replace('T', ' ') }}</span>
         </div>
         <p class="mt-1 text-sm text-slate-600">{{ entry.detail }}</p>
-        <p class="mt-1 text-xs text-slate-500">{{ entry.projectId }} · {{ entry.projectName }}</p>
+        <p class="mt-1 text-xs text-slate-500">
+          {{ entry.projectId }} · {{ entry.projectName }} · 当前 R{{ entry.currentRevision ?? '—' }}
+        </p>
       </article>
       <p v-if="!entries.length" class="py-10 text-center text-sm text-slate-500">没有符合条件的审计记录。</p>
     </div>

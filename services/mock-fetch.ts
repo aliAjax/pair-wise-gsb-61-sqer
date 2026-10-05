@@ -2,15 +2,27 @@ import { seedProjects } from '~/data/seed';
 import type { ApprovalProject } from '~/types/certification';
 
 const STORAGE_KEY = 'vehicle-type-approval-projects-v1';
+const BACKUP_KEY = `${STORAGE_KEY}:backup`;
 
 function currentProjects(): ApprovalProject[] {
   if (typeof localStorage === 'undefined') return structuredClone(seedProjects);
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as ApprovalProject[]) : structuredClone(seedProjects);
-  } catch {
-    return structuredClone(seedProjects);
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (raw) {
+    try {
+      return JSON.parse(raw) as ApprovalProject[];
+    } catch {
+      // 主键损坏，从最近完整批次恢复
+    }
   }
+  const backup = localStorage.getItem(BACKUP_KEY);
+  if (backup) {
+    try {
+      return JSON.parse(backup) as ApprovalProject[];
+    } catch {
+      // 备份也损坏，回退种子数据
+    }
+  }
+  return structuredClone(seedProjects);
 }
 
 export const mockFetch: typeof fetch = async (input) => {

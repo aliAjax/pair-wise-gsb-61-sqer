@@ -1,5 +1,12 @@
 <script setup lang="ts">
+import { useCertificationStore } from '~/stores/certification';
+
 const route = useRoute();
+const store = useCertificationStore();
+
+onMounted(() => {
+  store.hydrate();
+});
 
 const navItems = [
   { to: '/', label: '认证项目' },
